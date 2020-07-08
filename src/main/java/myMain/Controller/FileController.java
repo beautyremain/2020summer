@@ -51,10 +51,10 @@ public class FileController {
         String  sql = "update userinfo set userpic=? where email=? ";
         //jdbcTemplate.queryForList(sql,new Object[]{filePath+fileName,email});
         if(jdbcTemplate.update(sql,new Object[]{filePath+fileName,email})>0){
-            return "success";
+            return databus.setResponse(0,"success");
         }
         else{
-            return "fail to write in database";
+            return databus.setResponse(500,"fail to update into database");
         }
 
     }
@@ -62,11 +62,18 @@ public class FileController {
     @RequestMapping(value = "/getfile",method = RequestMethod.GET, produces = "image/jpg")
     public Object responseFile(@RequestParam String email,Model model){
         String  sql = "select userpic from userinfo where email=?";
-        String picPath = jdbcTemplate.queryForObject(sql,String.class,new Object[]{email});
-        if(picPath==null){
-            return "该用户没有头像";
+        Object picPath;
+        try {
+            picPath = jdbcTemplate.queryForObject(sql,Object.class,new Object[]{email});
         }
-        File file = new File(picPath);
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(401,"该用户不存在");
+        }
+        if(picPath==null){
+            return databus.setResponse(403,"该用户没有头像");
+        }
+        File file = new File((String)picPath);
         model.addAttribute("email",email);
         return export(file);
     }

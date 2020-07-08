@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/test")
-public class HelloController {
+public class TestController {
 private static String responseHeader="Access-Control-Allow-Origin";
     @Autowired
     JdbcTemplate jdbcTemplate;

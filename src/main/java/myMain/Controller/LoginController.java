@@ -29,7 +29,7 @@ public class LoginController {
     public Object login(@RequestParam String userEmail, @RequestParam String password, HttpSession httpSession, HttpServletResponse response){
         JSONObject jsonObject=new JSONObject();
         if(userEmail==null||password==null){
-            jsonObject.put("statusCode",403);
+            jsonObject.put("statusCode",406);
             jsonObject.put("messageDetail","登录信息不全");
             return jsonObject;
         }
@@ -42,14 +42,14 @@ public class LoginController {
 
         List result=jdbcTemplate.queryForList(sql_check,new Object[]{userEmail});
         if(result.isEmpty()){
-            jsonObject.put("statusCode",105);
+            jsonObject.put("statusCode",401);
             jsonObject.put("messageDetail","用户不存在");
             return jsonObject;
         }
         String sql_get="select name,nickname from userinfo where email=? and password=?";
         List result2=jdbcTemplate.queryForList(sql_get,new Object[]{userEmail,password});
         if(result2.isEmpty()){
-            jsonObject.put("statusCode",104);
+            jsonObject.put("statusCode",405);
             jsonObject.put("messageDetail","密码错误");
         }
         else {
@@ -85,16 +85,6 @@ public class LoginController {
             return "已登录";
         }
     }
-    @Autowired
-    VerifyCodeMailSender mailTest;
-
-    @RequestMapping(value = "/verification",method = {RequestMethod.GET,RequestMethod.POST})
-    public String sendEmail(@RequestParam String email){
-        String receiver = "jikang_cheng@qq.com";
-        mailTest.sendCodeToMail(receiver);
-        return "accept";
-    }
-
 
 
 }

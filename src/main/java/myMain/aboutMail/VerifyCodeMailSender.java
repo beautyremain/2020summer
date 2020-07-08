@@ -22,7 +22,7 @@ public class VerifyCodeMailSender {
         }
         return code;
     }
-    public void sendCodeToMail(String receiver_name){
+    public String sendCodeToMail(String receiver_name){
         emailServiceCode = getRandomCode(6);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setSubject("注册验证码");
@@ -31,5 +31,6 @@ public class VerifyCodeMailSender {
         message.setFrom("3391436581@qq.com");
         System.out.println(mailSender);
         mailSender.send(message);
+        return emailServiceCode;
     }
 }
