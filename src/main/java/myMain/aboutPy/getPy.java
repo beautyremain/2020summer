@@ -1,9 +1,12 @@
 package myMain.aboutPy;
 
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+@Component
 public class getPy {
     public static void get(){
         String[] args = new String[] { "python", "F:\\HelloWorld.py"};
