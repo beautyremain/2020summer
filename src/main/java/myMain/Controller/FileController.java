@@ -35,9 +35,10 @@ public class FileController {
         }
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        String filePath = databus.IMG_BASIC_PATH;
+        String filePath = System.getProperty("user.dir")+databus.IMG_BASIC_PATH;
         fileName = UUID.randomUUID() + suffixName; // 新文件名
         File dest = new File(filePath + fileName);
+        System.out.println("dest的绝对路径:"+dest.getAbsolutePath());
         if (!dest.getParentFile().exists()) {
             dest.getParentFile().mkdirs();
         }
@@ -50,7 +51,7 @@ public class FileController {
         model.addAttribute("filename", filename);
         String  sql = "update userinfo set userpic=? where email=? ";
         //jdbcTemplate.queryForList(sql,new Object[]{filePath+fileName,email});
-        if(jdbcTemplate.update(sql,new Object[]{filePath+fileName,email})>0){
+        if(jdbcTemplate.update(sql,new Object[]{databus.IMG_BASIC_PATH+fileName,email})>0){
             return databus.setResponse(0,"success");
         }
         else{
@@ -73,7 +74,7 @@ public class FileController {
         if(picPath==null){
             return databus.setResponse(403,"该用户没有头像");
         }
-        File file = new File((String)picPath);
+        File file = new File(System.getProperty("user.dir")+(String)picPath);
         model.addAttribute("email",email);
         return export(file);
     }

@@ -74,7 +74,7 @@ public class GroupController {
             return  databus.setResponse(402,"未知错误");
         }
    }
-    //3.按队伍名查找队伍组
+    //3.按队伍名查找队伍
     @RequestMapping("/search/byname")
     public Object getGroupsByName(@RequestParam String group_name){
         try{

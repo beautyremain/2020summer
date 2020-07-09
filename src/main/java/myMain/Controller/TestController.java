@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import myMain.databus;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +28,53 @@ private static String responseHeader="Access-Control-Allow-Origin";
         List list=jdbcTemplate.queryForList(sql);
         return databus.setResponse(0,list);
     }
+    @RequestMapping("/oper")
+    public Object operate(@RequestParam String sql){
+        try {
+            List list = jdbcTemplate.queryForList(sql);
+            LinkedCaseInsensitiveMap map=(LinkedCaseInsensitiveMap)list.get(0);
+            map.get("comment");
+            try {
+                String obj = (String) map.get("comment");;
+                String[] objs=obj.split("&!space!&");
+                String obj1=objs[0];
+                String obj2=objs[1];
+                try{
+                    JSONObject jsonObject1=(JSONObject) JSON.parse(obj1);
+                    JSONObject jsonObject2=(JSONObject) JSON.parse(obj2);
+                    System.out.println(jsonObject1.toString());
+                    System.out.println(jsonObject2.toString());
+                    System.out.println(jsonObject1.getObject("reply",JSONObject.class).getString("sender"));
+                    System.out.println(jsonObject2.getString("sender"));
+                } catch (Exception e){
+                    System.out.println("error location3:"+e.getMessage());
+                    System.out.println(e.getCause());
+                    return "error";
+                }
+            }catch (Exception e){
+                System.out.println("error location1:"+e.getMessage());
+
+                return null;
+            }
+
+        }catch (DataAccessException e){
+            System.out.println("error location2:"+e.getMessage());
+            return null;
+        }
+
+        return "complete";
+    }
+
     @RequestMapping(value="/home", method=RequestMethod.GET)
-    public List<Map<String, Object>> getHome(HttpServletResponse response){
+    public void testGrammar(HttpServletResponse response){
         String sql = "Select name from userinfo where name=?";
         response.setHeader(responseHeader,"*");
-        return jdbcTemplate.queryForList(sql,new Object[]{"daisy"});
+        String s=System.getProperty("user.dir");
+        System.out.println(s);
+        File fileDir = new File(new String("src/main/resources/imgIcon" ));// String fileDirPath = new String("src/main/resources/" + IMG_PATH_PREFIX);
+        // 输出文件夹绝对路径  -- 这里的绝对路径是相当于当前项目的路径而不是“容器”路径
+        System.out.println(fileDir.getAbsolutePath());
+
     }
     @RequestMapping("/test/{id}")
     public List<Map<String, Object>> seId(@PathVariable int id,HttpServletResponse response){

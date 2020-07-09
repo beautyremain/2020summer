@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 public class databus {
 
 
-    public static String IMG_BASIC_PATH = "F:\\iconImg\\";
+    public static final String IMG_BASIC_PATH = "/src/main/resources/imgIcon/";
 
 
 
