@@ -95,7 +95,7 @@ public class RegisterController {
                 return databus.setResponse(406,"参数不齐");
             }
             if(
-                    LoginController.stringIllegal(email)
+                      LoginController.stringIllegal(email)
                     ||LoginController.stringIllegal(sex)
                     ||LoginController.stringIllegal(password)
                     ||LoginController.stringIllegal(name)

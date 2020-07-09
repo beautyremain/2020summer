@@ -3,6 +3,7 @@ package myMain.Controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import myMain.databus;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,10 +19,11 @@ public class TestController {
 private static String responseHeader="Access-Control-Allow-Origin";
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @CrossOrigin(origins = "*",allowCredentials = "true")
     @RequestMapping(value="/sql", method=RequestMethod.GET)
-    public List<Map<String, Object>> index(HttpServletResponse response,@RequestParam String sql) {
-        response.setHeader("Access-Control-Allow-Origin","*");
-        return      jdbcTemplate.queryForList(sql);
+    public Object index(@RequestParam String sql) {
+        List list=jdbcTemplate.queryForList(sql);
+        return databus.setResponse(0,list);
     }
     @RequestMapping(value="/home", method=RequestMethod.GET)
     public List<Map<String, Object>> getHome(HttpServletResponse response){
