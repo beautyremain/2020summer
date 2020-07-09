@@ -2,6 +2,7 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import myMain.aboutSearch.SingleSearch;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -88,6 +89,10 @@ public class UserInfoController {
 
     }
 
+    @Autowired
+    SingleSearch singleSearch;
+
+
     @RequestMapping("/search/bylabels")
     public Object searchUserByLabel(@RequestParam String labels) {
         try {
@@ -98,13 +103,7 @@ public class UserInfoController {
                 sql += "label like '%" + labelList[i] + "%' and ";
             }
             sql += "label like '%" + labelList[len - 1] + "%'";
-            try{
-                List list=jdbcTemplate.queryForList(sql);
-                return databus.setResponse(0,list);
-            }catch (DataAccessException e){
-                System.out.println(e.getMessage());
-                return databus.setResponse(500,"后台运行异常");
-            }
+            return singleSearch.searchForList(sql);
         }catch(Exception e){
             System.out.println(e.getMessage());
             return databus.setResponse(402,"未知错误");
@@ -116,13 +115,7 @@ public class UserInfoController {
     public Object searchUserByEmail(@RequestParam String email){
         try{
             String  sql = "select * from userinfo where email=?";
-            try{
-                List result = jdbcTemplate.queryForList(sql,email);
-                return databus.setResponse(result);
-            }catch (DataAccessException e){
-                System.out.println(e.getMessage());
-                return databus.setResponse(500,"后台运行异常");
-            }
+            return singleSearch.searchForList(sql,email);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return databus.setResponse(402,"未知错误");
