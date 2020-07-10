@@ -214,14 +214,29 @@ public class NewsController {
     }
 
     //7.评论的通知 组队信息通知队长 暂时不适用实时信息传输
-    @RequestMapping("/new/comment")
-    public Object newComment(@RequestParam String email,@RequestParam String latest_id){
+    @RequestMapping("/inform/comment")
+    public Object newComment(@RequestParam String email,@RequestParam String newest_id,@RequestParam String oldest_id,@RequestParam String goal){
         try {
-            if (email == null || latest_id == null) {
+            if (email == null || oldest_id == null || newest_id == null || goal == null) {
                 return databus.setResponse(401, "参数不全");
             }
-            String sql = " select * from news_info_stream where type='3' and id>? and response_id in (select id from news_info_stream where sender = ?) order by id desc limit ?";
-            List result=jdbcTemplate.queryForList(sql,new Object[]{latest_id,email,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
+//            if (goal.equals(getNew)) {
+//                String sql = "select * from news_info_stream where id>? and type=? order by id desc limit ?";
+//                List result = jdbcTemplate.queryForList(sql,new Object[]{newest_id,type,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
+//                return databus.setResponse(result);
+//            }
+//            else if(goal.equals(getHistory)){
+//                String sql = "select * from news_info_stream where id<? and type=? order by id desc limit ?";
+//                List result = jdbcTemplate.queryForList(sql,new Object[]{oldest_id,type,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
+//                return databus.setResponse(result);
+//            }
+            if(!goal.equals(getNew)&&!goal.equals(getHistory)) {
+               return databus.setResponse(406,"目标有误:"+goal);
+            }
+            String g = goal.equals(getNew)? ">":"<";
+            String i = goal.equals(getNew)? newest_id:oldest_id;
+            String sql = " select * from news_info_stream where type='3' and id"+g+"? and response_id in (select id from news_info_stream where sender = ?) order by id desc limit ?";
+            List result=jdbcTemplate.queryForList(sql,new Object[]{i,email,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
             if(result.isEmpty()){
                 return databus.setResponse("没有新消息");
             }
