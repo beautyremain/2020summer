@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 public class LoginController {
@@ -21,7 +22,7 @@ public class LoginController {
     @Autowired
     JdbcTemplate jdbcTemplate;
     public static boolean stringIllegal(String str){
-        return(str.contains("\'")||str.contains("\"")||str.contains(";"));
+        return(str.contains("\'")||str.contains("\"")||str.contains(";")|| Pattern.matches("<\\s*script", str));
     }
     //登录的验证
     @CrossOrigin(origins = "http://127.0.0.1:8020",allowCredentials = "true")

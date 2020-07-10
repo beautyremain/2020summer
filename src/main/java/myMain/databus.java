@@ -6,7 +6,7 @@ public class databus {
 
 
     public static final String IMG_BASIC_PATH = "/src/main/resources/imgIcon/";
-
+    public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
 
 
 
