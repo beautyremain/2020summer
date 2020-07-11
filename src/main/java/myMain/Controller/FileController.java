@@ -3,6 +3,7 @@ package myMain.Controller;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +37,10 @@ public class FileController {
         }
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        String path_dir = type=="imgIcon"? databus.ICON_IMG_BASIC_PATH:databus.DYNAMIC_IMG_BASIC_PATH;
+        String path_dir = type.equals("imgIcon")? databus.ICON_IMG_BASIC_PATH:databus.DYNAMIC_IMG_BASIC_PATH;
         String filePath = System.getProperty("user.dir")+path_dir;
         fileName = UUID.randomUUID() + suffixName; // 新文件名
-        File dest = new File(filePath + fileName);
+        File dest = new File(filePath +""+fileName);
         System.out.println("dest的绝对路径:"+dest.getAbsolutePath());
         if (!dest.getParentFile().exists()) {
             dest.getParentFile().mkdirs();
@@ -55,21 +56,21 @@ public class FileController {
         model.addAttribute("filename", filename);
 
 
-        String  sql = type=="imgIcon"?"update userinfo set userpic=? where email=? ":"update news_info_stream set pic_name=? where id=? ";
+        String  sql = type.equals("imgIcon")?"update userinfo set userpic=? where email=? ":"update news_info_stream set pic_name=? where id=? ";
         //jdbcTemplate.queryForList(sql,new Object[]{filePath+fileName,email});
-        if(jdbcTemplate.update(sql,new Object[]{fileName,target})>0){
+        try {
+            jdbcTemplate.update(sql,new Object[]{fileName,target});
             return databus.setResponse(0,"success");
-        }
-        else{
+        }catch (DataAccessException e){
+            System.out.println(e.getMessage());
             return databus.setResponse(500,"fail to update into database");
         }
-
     }
 
     @RequestMapping(value = "/ImgDownload/{type}",method = RequestMethod.GET, produces = "image/jpg")
     public Object responseFile(@RequestParam String imgName,@PathVariable String type){
         try {
-            String path_dir = type == "imgIcon" ? databus.ICON_IMG_BASIC_PATH : databus.DYNAMIC_IMG_BASIC_PATH;
+            String path_dir = type.equals("imgIcon") ? databus.ICON_IMG_BASIC_PATH : databus.DYNAMIC_IMG_BASIC_PATH;
             File file = new File(System.getProperty("user.dir") + path_dir + imgName);
             return export(file);
         } catch (Exception e){
