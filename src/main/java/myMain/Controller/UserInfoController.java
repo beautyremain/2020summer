@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+//有关用户信息的控制器
 
 @RequestMapping("/userInfo")
 @RestController
@@ -21,6 +22,7 @@ public class UserInfoController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    //获得所有的label
     @RequestMapping("/getLabels")
     public Object getLabels(){
         JSONObject jsonObject = new JSONObject();
@@ -33,6 +35,7 @@ public class UserInfoController {
         }
     }
 
+    //为某一用户添加label
     @RequestMapping("/setLabels")
     public Object setLabels(@RequestParam String email,@RequestParam String labels){
         try {
@@ -52,6 +55,7 @@ public class UserInfoController {
         }
 
     }
+    //保存用户详细信息
     @RequestMapping("/setinfo")
     public Object setInfoDetail(@RequestParam String email,@RequestParam String info){
         if(info.isEmpty()){
@@ -68,10 +72,10 @@ public class UserInfoController {
                 return databus.setResponse(406,"参数不全");
             }
             if(
-                    LoginController.stringIllegal(school)
-                            ||LoginController.stringIllegal(grade)
-                            ||LoginController.stringIllegal(career)
-                            ||LoginController.stringIllegal(sno)){
+                    databus.stringIllegal(school)
+                            ||databus.stringIllegal(grade)
+                            ||databus.stringIllegal(career)
+                            ||databus.stringIllegal(sno)){
                 return databus.setResponse(403,"参数非法");
             }
             try {
@@ -92,7 +96,7 @@ public class UserInfoController {
     @Autowired
     SingleSearch singleSearch;
 
-
+    //根据标签查找用户
     @RequestMapping("/search/bylabels")
     public Object searchUserByLabel(@RequestParam String labels) {
         try {
@@ -111,6 +115,7 @@ public class UserInfoController {
 
     }
 
+    //根据邮箱查找用户
     @RequestMapping("/search/byemail")
     public Object searchUserByEmail(@RequestParam String email){
         try{

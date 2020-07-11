@@ -30,7 +30,9 @@ public class RegisterController {
             if(email == null){
                 return databus.setResponse(406,"没有参数");
             }
+            //调用邮箱组件
             String code=mailTest.sendCodeToMail(receiver);
+            //验证码存入session 方便在下次提交时验证
             session.removeAttribute("verCode");
             session.setAttribute("verCode",code);
             return databus.setResponse(0,"邮件发送成功");
@@ -64,6 +66,7 @@ public class RegisterController {
     public Object checkCode(@RequestParam String code,HttpSession session){
 
         try{
+            //获得正确验证码
             Object verCode = session.getAttribute("verCode");
             if(verCode == null || code == null){
                 return databus.setResponse(403,"验证超时或验证信息不全");
@@ -95,11 +98,11 @@ public class RegisterController {
                 return databus.setResponse(406,"参数不齐");
             }
             if(
-                      LoginController.stringIllegal(email)
-                    ||LoginController.stringIllegal(sex)
-                    ||LoginController.stringIllegal(password)
-                    ||LoginController.stringIllegal(name)
-                    ||LoginController.stringIllegal(nickname)){
+                    databus.stringIllegal(email)
+                    ||databus.stringIllegal(sex)
+                    ||databus.stringIllegal(password)
+                    ||databus.stringIllegal(name)
+                    ||databus.stringIllegal(nickname)){
                 return databus.setResponse(403,"参数非法");
             }
             String sql = "insert into userinfo(name,sex,nickname,password,email) values(?,?,?,?,?)";

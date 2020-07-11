@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+
+//对单个关键字的sql简单检索进行抽象，简化代码
 @Component
 public class SingleSearch {
 

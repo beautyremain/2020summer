@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 
 
 @SpringBootApplication
-public class HelloWorld {
+public class BetterMatch {
     public static void main(String[] args) {
-        SpringApplication.run(HelloWorld.class, args);
+        SpringApplication.run(BetterMatch.class, args);
     }
 }

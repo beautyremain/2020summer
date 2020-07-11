@@ -3,6 +3,7 @@ package myMain.Controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import myMain.aboutPy.getPy;
 import myMain.databus;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,16 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/test")
+
+
+//此控制器作为测试依赖用法与语法的模块，在实际发布时会删除
 public class TestController {
 private static String responseHeader="Access-Control-Allow-Origin";
     @Autowired
@@ -97,4 +102,17 @@ private static String responseHeader="Access-Control-Allow-Origin";
 
         return jsonObject;
     }
+
+    @RequestMapping(value = "/out",method={RequestMethod.GET,RequestMethod.POST})
+    public Object out(HttpSession session){
+        getPy.get();
+        Object usr = session.getAttribute("loginUser");
+        if(usr == null){
+            return session.toString();
+        }
+        else {
+            return "已登录";
+        }
+    }
+
 }

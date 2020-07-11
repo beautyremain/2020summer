@@ -36,11 +36,11 @@ public class NewsController {
             if(message == null || sender == null){
                 return databus.setResponse(405,"输入信息不全");
             }
-            if(LoginController.stringIllegal(message)){
+            if(databus.stringIllegal(message)){
                 return databus.setResponse(403,"输入信息非法");
             }
             String sql_insert = "insert into news_info_stream(main_id,response_id,message,sender,type) values(?,?,?,?,?)";
-            String sql_getId = "select max(id) from news_info_stream";
+            String sql_getId = "select max(id) from news_info_stream";//取出最大id
             try{
                 int old_id=jdbcTemplate.queryForObject(sql_getId,Integer.class);
                 String new_id= Integer.toString(old_id+1);
@@ -75,14 +75,18 @@ public class NewsController {
             if(newest_id == null || oldest_id == null ){
                 return databus.setResponse(401, "输入信息不全");
             }
+            //取出该用户关注名单
                 String sql_getAttentions = "select attention from userinfo where email=?";
                 String Attentions = jdbcTemplate.queryForObject(sql_getAttentions, String.class, sender_email);
                 String[] AttenList=Attentions.toString().split(",");
+
+                //拼接关注名单作为之后的检索条件
                 String conditionStr="(";
                 for(int i=0;i<AttenList.length-1;i++){
                     conditionStr += " sender='"+AttenList[i]+"' or";
                 }
                 conditionStr += " sender='"+AttenList[AttenList.length-1]+"' )";
+                //分类查询
                 if(goal.equals(getNew)) {
                     String sql_getDynamics = "select * from news_info_stream where id>? and type='0' and "+conditionStr+"order by id desc limit 10";
                     System.out.println(sql_getDynamics);
@@ -127,7 +131,7 @@ public class NewsController {
                 return databus.setResponse(401, "输入信息不全");
             }
             try {
-
+                //分类检索
                 if (goal.equals(getNew)) {
                     String sql = "select * from news_info_stream where id>? and type=? order by id desc limit ?";
                     List result = jdbcTemplate.queryForList(sql,new Object[]{newest_id,type,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
@@ -157,6 +161,7 @@ public class NewsController {
 
     //8.评论的回复
     //9.评论的发布
+    //评论作为一种特殊类型的动态
 
 
     @RequestMapping("/send/comment")
@@ -247,7 +252,7 @@ public class NewsController {
             return databus.setResponse(402,"未知错误："+e.getMessage());
         }
     }
-    //动态点赞 0为系统通知,1为点赞通知,2为比赛通知
+    //动态点赞 1为点赞通知
     @RequestMapping("/send/like")
     public Object sendLike(@RequestParam String sender_email,@RequestParam String response_id,@RequestParam String brief_msg){
         try{

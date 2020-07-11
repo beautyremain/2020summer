@@ -1,3 +1,9 @@
+/*
+   author: BeautyRemain(程季康)
+*/
+
+
+
 package myMain.aboutMail;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +19,7 @@ public class VerifyCodeMailSender {
     @Autowired
     JavaMailSenderImpl mailSender;
     String emailServiceCode;
+    //生成随机验证码
     public static String getRandomCode(int len){
         String str = "90GABHO24I63WXJ1YZ78KLMCDEN5PSTFUQRV";
         String code = "";
@@ -22,6 +29,7 @@ public class VerifyCodeMailSender {
         }
         return code;
     }
+    //使用SimpleMailMessage发送验证码
     public String sendCodeToMail(String receiver_name){
         emailServiceCode = getRandomCode(6);
         SimpleMailMessage message = new SimpleMailMessage();

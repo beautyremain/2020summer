@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
+//组队有关的接口
+
 @RestController
 @RequestMapping("/group")
 public class GroupController {
@@ -36,9 +39,9 @@ public class GroupController {
                 return databus.setResponse(406, "参数不全");
             }
             if (
-                    LoginController.stringIllegal(group_name)
-                            || LoginController.stringIllegal(size)
-                            || LoginController.stringIllegal(intend_comp)) {
+                    databus.stringIllegal(group_name)
+                            || databus.stringIllegal(size)
+                            || databus.stringIllegal(intend_comp)) {
                 return databus.setResponse(403, "参数非法");
             }
             try{
@@ -107,9 +110,13 @@ public class GroupController {
             String sql_get_old_id = "select group_id from userinfo where email=?";
             String sql_get_old_emails = "select member_emails from groupinfo where id=? and size>member_num";
             try {
+
+                //先拿到目前最大id，方便之后的插入时直接将id值填入main和response属性
                 String old_id = jdbcTemplate.queryForObject(sql_get_old_id, String.class, email);
                 String new_id =  old_id==""?group_id:old_id+","+group_id;
                 String old_member_emails = jdbcTemplate.queryForObject(sql_get_old_emails,String.class,group_id);
+
+
                 String new_member_emails = old_member_emails+","+email;
                 String sql_update_id = "update userinfo set group_id=? where email=?";
                 String sql_update_emails = "update groupinfo set member_emails=?,member_num=member_num+1 where id=?";

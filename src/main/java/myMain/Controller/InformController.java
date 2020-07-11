@@ -25,7 +25,7 @@ public class InformController {
     private  static final  String getHistory="1";
     //type:0为系统通知,1为点赞通知,2为比赛通知,3为评论通知
     @RequestMapping("/all/{type}")
-    //7.评论的通知 组队信息通知队长 暂时不适用实时信息传输
+    //7.评论的通知 组队信息通知队长 暂时不考虑基于websocket的全双工实时信息传输，依然使用http模式
     public Object inform(@RequestParam String email, @RequestParam String newest_id, @RequestParam String oldest_id, @RequestParam String goal, @PathVariable String type){
         try {
             if (email == null || oldest_id == null || newest_id == null || goal == null || type == null) {
@@ -34,8 +34,12 @@ public class InformController {
             if(!goal.equals(getNew)&&!goal.equals(getHistory)) {
                 return databus.setResponse(406,"目标有误:"+goal);
             }
+
+            //创建在不同目标类型下sql语句的差异处
             String g = goal.equals(getNew)? ">":"<";
             String i = goal.equals(getNew)? newest_id:oldest_id;
+
+
             String sql = null;
             List result = null;
             if(type.equals("3")) {
@@ -52,8 +56,6 @@ public class InformController {
             }
 
             return databus.setResponse(result);
-
-
 
 
         }

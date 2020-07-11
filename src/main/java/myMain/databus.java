@@ -2,6 +2,9 @@ package myMain;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.regex.Pattern;
+
+//全局变量与函数
 public class databus {
 
 
@@ -10,7 +13,7 @@ public class databus {
     public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
 
 
-
+    //生成响应包
     public static Object setResponse(int statusCode,Object messageDetail){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("statusCode",statusCode);
@@ -21,6 +24,9 @@ public class databus {
         return setResponse(0,messageDetail);
     }
 
-
+    //检查sql与js注入
+    public static boolean stringIllegal(String str){
+        return(str.contains("\'")||str.contains("\"")||str.contains(";")|| Pattern.matches("<\\s*script", str));
+    }
 
 }

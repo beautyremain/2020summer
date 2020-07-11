@@ -1,8 +1,7 @@
 package myMain.Controller;
 
 import com.alibaba.fastjson.JSONObject;
-import myMain.aboutMail.VerifyCodeMailSender;
-import myMain.aboutPy.getPy;
+import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -17,14 +16,12 @@ import java.util.regex.Pattern;
 @RestController
 public class LoginController {
     @Autowired
+
     JavaMailSenderImpl mailSender;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
-    public static boolean stringIllegal(String str){
-        return(str.contains("\'")||str.contains("\"")||str.contains(";")|| Pattern.matches("<\\s*script", str));
-    }
-    //登录的验证
+    //登录的验证 CrossOrigin解决在本地直接用浏览器进行访问时的跨域问题，allowCredentials保证跨域时session不刷新
     @CrossOrigin(origins = "http://127.0.0.1:8020",allowCredentials = "true")
     @RequestMapping(value="/login",method = {RequestMethod.GET,RequestMethod.POST})
     public Object login(@RequestParam String userEmail, @RequestParam String password, HttpSession httpSession, HttpServletResponse response){
@@ -34,7 +31,7 @@ public class LoginController {
             jsonObject.put("messageDetail","登录信息不全");
             return jsonObject;
         }
-        if(stringIllegal(userEmail)||stringIllegal(password)){
+        if(databus.stringIllegal(userEmail)||databus.stringIllegal(password)){
             jsonObject.put("statusCode",403);
             jsonObject.put("messageDetail","登录信息含有非法字符");
             return jsonObject;
@@ -75,17 +72,7 @@ public class LoginController {
             return "已登录";
         }
     }
-    @RequestMapping(value = "/out",method={RequestMethod.GET,RequestMethod.POST})
-    public Object out(HttpSession session){
-        getPy.get();
-        Object usr = session.getAttribute("loginUser");
-        if(usr == null){
-            return session.toString();
-        }
-        else {
-            return "已登录";
-        }
-    }
+
 
 
 }
