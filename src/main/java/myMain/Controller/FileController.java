@@ -1,41 +1,43 @@
 package myMain.Controller;
 
 import myMain.databus;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/file")
 public class FileController {
+
+    //文件上传
+
+
+
+
 
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-    @RequestMapping(value = "/fileUpload",method = RequestMethod.POST)
-    public Object getFile(@RequestParam MultipartFile file,@RequestParam String email, Model model) {
-        if (file.isEmpty()||LoginController.stringIllegal(email)) {
+    //type: imgIcon\imgDynamic
+    @RequestMapping(value = "/ImgUpload/{type}",method = RequestMethod.POST)
+    public Object getFile(@RequestParam MultipartFile file, @RequestParam String target, Model model, @PathVariable String type) {
+        if (file.isEmpty()||LoginController.stringIllegal(target)) {
             return null;
         }
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        String filePath = System.getProperty("user.dir")+databus.IMG_BASIC_PATH;
+        String path_dir = type=="imgIcon"? databus.ICON_IMG_BASIC_PATH:databus.DYNAMIC_IMG_BASIC_PATH;
+        String filePath = System.getProperty("user.dir")+path_dir;
         fileName = UUID.randomUUID() + suffixName; // 新文件名
         File dest = new File(filePath + fileName);
         System.out.println("dest的绝对路径:"+dest.getAbsolutePath());
@@ -47,11 +49,15 @@ public class FileController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
         String filename = "/temp-rainy/" + fileName;
         model.addAttribute("filename", filename);
-        String  sql = "update userinfo set userpic=? where email=? ";
+
+
+        String  sql = type=="imgIcon"?"update userinfo set userpic=? where email=? ":"update news_info_stream set pic_name=? where id=? ";
         //jdbcTemplate.queryForList(sql,new Object[]{filePath+fileName,email});
-        if(jdbcTemplate.update(sql,new Object[]{databus.IMG_BASIC_PATH+fileName,email})>0){
+        if(jdbcTemplate.update(sql,new Object[]{fileName,target})>0){
             return databus.setResponse(0,"success");
         }
         else{
@@ -60,23 +66,16 @@ public class FileController {
 
     }
 
-    @RequestMapping(value = "/getfile",method = RequestMethod.GET, produces = "image/jpg")
-    public Object responseFile(@RequestParam String email,Model model){
-        String  sql = "select userpic from userinfo where email=?";
-        Object picPath;
+    @RequestMapping(value = "/ImgDownload/{type}",method = RequestMethod.GET, produces = "image/jpg")
+    public Object responseFile(@RequestParam String imgName,@PathVariable String type){
         try {
-            picPath = jdbcTemplate.queryForObject(sql,Object.class,new Object[]{email});
-        }
-        catch (Exception e){
+            String path_dir = type == "imgIcon" ? databus.ICON_IMG_BASIC_PATH : databus.DYNAMIC_IMG_BASIC_PATH;
+            File file = new File(System.getProperty("user.dir") + path_dir + imgName);
+            return export(file);
+        } catch (Exception e){
             System.out.println(e.getMessage());
-            return databus.setResponse(401,"该用户不存在");
+            return null;
         }
-        if(picPath==null){
-            return databus.setResponse(403,"该用户没有头像");
-        }
-        File file = new File(System.getProperty("user.dir")+(String)picPath);
-        model.addAttribute("email",email);
-        return export(file);
     }
     private  ResponseEntity export(File file){
         if (file == null) {

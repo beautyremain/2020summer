@@ -5,7 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 public class databus {
 
 
-    public static final String IMG_BASIC_PATH = "/src/main/resources/imgIcon/";
+    public static final String ICON_IMG_BASIC_PATH = "/src/main/resources/imgIcon/";
+    public static final String DYNAMIC_IMG_BASIC_PATH = "/src/main/resources/DYNAMIC";
     public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
 
 
