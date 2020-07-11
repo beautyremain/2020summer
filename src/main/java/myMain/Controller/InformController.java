@@ -23,7 +23,7 @@ public class InformController {
     //goal : getNew:0,getHistory:1
     private  static final String getNew="0";
     private  static final  String getHistory="1";
-    //0为系统通知,1为点赞通知,2为比赛通知,3为评论通知
+    //type:0为系统通知,1为点赞通知,2为比赛通知,3为评论通知
     @RequestMapping("/all/{type}")
     //7.评论的通知 组队信息通知队长 暂时不适用实时信息传输
     public Object inform(@RequestParam String email, @RequestParam String newest_id, @RequestParam String oldest_id, @RequestParam String goal, @PathVariable String type){
@@ -43,7 +43,7 @@ public class InformController {
                 result = jdbcTemplate.queryForList(sql, new Object[]{i, email, databus.RESPONSE_MAX_DYNAMICS_NUMBER});
             }
             else{
-                sql = "select * from inform_table where type=? and id"+g+"? and (response_id in (select id from news_info_stream where sender = ? or sender like'\"cap\":%\"" + email + "%\"' ) or response_id='0') order by id desc limit ?";
+                sql = "select * from inform_table where type=? and id"+g+"? and (response_id in (select id from news_info_stream where sender = ? or sender like '%\"cap\":\"" + email + "\"%' ) or response_id='0') order by id desc limit ?";
                 result =jdbcTemplate.queryForList(sql,new Object[]{type,i,email,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
             }
             System.out.println(sql);
