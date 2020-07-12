@@ -103,36 +103,6 @@ public class GroupController {
 
 
 
-    //5.加入队伍
-    @RequestMapping("/joinTeam")
-    public Object joinTeam(@RequestParam String group_id,@RequestParam String email){
-        try {
-            String sql_get_old_id = "select group_id from userinfo where email=?";
-            String sql_get_old_emails = "select member_emails from groupinfo where id=? and size>member_num";
-            try {
-
-                //先拿到目前最大id，方便之后的插入时直接将id值填入main和response属性
-                String old_id = jdbcTemplate.queryForObject(sql_get_old_id, String.class, email);
-                String new_id =  old_id==""?group_id:old_id+","+group_id;
-                String old_member_emails = jdbcTemplate.queryForObject(sql_get_old_emails,String.class,group_id);
-
-
-                String new_member_emails = old_member_emails+","+email;
-                String sql_update_id = "update userinfo set group_id=? where email=?";
-                String sql_update_emails = "update groupinfo set member_emails=?,member_num=member_num+1 where id=?";
-                jdbcTemplate.update(sql_update_id,new Object[]{new_id,email});
-                jdbcTemplate.update(sql_update_emails,new Object[]{new_member_emails,group_id});
-            } catch (DataAccessException e) {
-                System.out.println(e.getMessage());
-                return databus.setResponse(500, "信息存入失败,检查数据是否有误");
-            }
-            return databus.setResponse("加入成功");
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-            return  databus.setResponse(402,"未知错误");
-        }
-
-    }
 
 
 }

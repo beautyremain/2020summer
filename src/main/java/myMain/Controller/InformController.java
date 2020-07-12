@@ -19,7 +19,6 @@ public class InformController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-
     //goal : getNew:0,getHistory:1
     private  static final String getNew="0";
     private  static final  String getHistory="1";
