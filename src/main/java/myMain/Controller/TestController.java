@@ -2,7 +2,7 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import myMain.aboutPy.getPy;
+import myMain.aboutPy.GetPy;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -108,7 +108,7 @@ private static String responseHeader="Access-Control-Allow-Origin";
     public Object out(){
         String type="0";
         String id="1";
-        String[] id_list=(String[]) getPy.getAlgorithmResult(type,id);
+        String[] id_list=(String[]) GetPy.getAlgorithmResult(type,id);
 
         String condition="";
         for(String each : id_list){

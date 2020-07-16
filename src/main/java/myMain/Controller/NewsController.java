@@ -2,7 +2,7 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import myMain.aboutPy.getPy;
+import myMain.aboutPy.GetPy;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -20,17 +20,23 @@ import java.util.List;
 public class NewsController {
     @Autowired
     JdbcTemplate jdbcTemplate;
-
+    @Autowired
+    GetPy getPy;
     //智能动态检索
     @RequestMapping("/search")
     public Object searchNews(@RequestParam String keySentence){
         String[] id_list=(String[]) getPy.getSearchResult(keySentence);
+        if(id_list == null){
+            return databus.setResponse("没有搜索结果");
+        }
         String condition="";
         for(String each : id_list){
-        condition+=each+",";
+            //System.out.println("each:"+each);
+            condition+=each+",";
         }
         condition=condition.substring(0,condition.length()-1);
         String sql = "select * from news_info_stream where id in("+condition+")";System.out.println(sql);
+        //System.out.println("target:"+sql);
         List result=jdbcTemplate.queryForList(sql);
         return databus.setResponse(result,id_list);
     }
@@ -294,7 +300,7 @@ public class NewsController {
 
     }
     /*
-    author: 郑文宏
+    author: 郑文鸿
     create time: 2020/7/16 15:50
     */
     //取消点赞

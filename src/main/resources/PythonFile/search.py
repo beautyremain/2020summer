@@ -13,7 +13,7 @@ def check_language(str):
 def processor(msg_list,key):
     point_counts_list=[]
     key_words=jieba.analyse.extract_tags(sentence=key,topK=3)
-    # print(key_words)
+    print(key_words)
     for msg in msg_list[:,1]:
         msg_keys = jieba.lcut(msg)
         point=0

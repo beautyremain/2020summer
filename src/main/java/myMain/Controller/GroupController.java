@@ -3,7 +3,7 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import myMain.aboutPy.getPy;
+import myMain.aboutPy.GetPy;
 import myMain.aboutSearch.SingleSearch;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,10 @@ public class GroupController {
     //推荐队伍/个人
     @RequestMapping("/getRecommand/{type}")
     public Object getRecommand(@RequestParam String id, @PathVariable String type){
-        String[] id_list=(String[]) getPy.getAlgorithmResult(type,id);
+        String[] id_list=(String[]) GetPy.getAlgorithmResult(type,id);
+        if(id_list == null){
+            return  databus.setResponse("没有推荐结果");
+        }
         String condition="";
         for(String each : id_list){
             condition+=each+",";

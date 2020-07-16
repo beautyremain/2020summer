@@ -12,6 +12,7 @@ public class databus {
     public static final String DYNAMIC_IMG_BASIC_PATH = "/src/main/resources/DYNAMIC/";
     public static final String PYTHON_PATH = "/src/main/resources/PythonFile";
     public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
+    public static final int HEAT_PER_PRESON = 60;
 
 
     //生成响应包
