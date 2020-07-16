@@ -2,6 +2,7 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import myMain.aboutPy.getPy;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -19,6 +20,20 @@ import java.util.List;
 public class NewsController {
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    //智能动态检索
+    @RequestMapping("/search")
+    public Object searchNews(@RequestParam String keySentence){
+        String[] id_list=(String[]) getPy.getSearchResult(keySentence);
+        String condition="";
+        for(String each : id_list){
+        condition+=each+",";
+        }
+        condition=condition.substring(0,condition.length()-1);
+        String sql = "select * from news_info_stream where id in("+condition+")";System.out.println(sql);
+        List result=jdbcTemplate.queryForList(sql);
+        return databus.setResponse(result,id_list);
+    }
 
     //1.普通动态的发布 0
     //2.招募信息的发布 1
