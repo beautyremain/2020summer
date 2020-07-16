@@ -10,6 +10,7 @@ public class databus {
 
     public static final String ICON_IMG_BASIC_PATH = "/src/main/resources/imgIcon/";
     public static final String DYNAMIC_IMG_BASIC_PATH = "/src/main/resources/DYNAMIC/";
+    public static final String PYTHON_PATH = "/src/main/resources/PythonFile";
     public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
 
 
@@ -23,7 +24,13 @@ public class databus {
     public static Object setResponse(Object messageDetail){
         return setResponse(0,messageDetail);
     }
-
+    public static Object setResponse(Object messageDetail,Object order){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("statusCode",0);
+        jsonObject.put("messageDetail",messageDetail);
+        jsonObject.put("order",order);
+        return  jsonObject;
+    }
     //检查sql与js注入
     public static boolean stringIllegal(String str){
         return(str.contains("\'")||str.contains("\"")||str.contains(";")|| Pattern.matches("<\\s*script", str));

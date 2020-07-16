@@ -3,11 +3,14 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import myMain.aboutPy.getPy;
 import myMain.aboutSearch.SingleSearch;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +25,22 @@ import java.util.List;
 public class GroupController {
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    //推荐队伍/个人
+    @RequestMapping("/getRecommand/{type}")
+    public Object getRecommand(@RequestParam String id, @PathVariable String type){
+        String[] id_list=(String[]) getPy.get(type,id);
+        String condition="";
+        for(String each : id_list){
+            condition+=each+",";
+        }
+        condition=condition.substring(0,condition.length()-1);
+        String sql = "select * from groupinfo where id in("+condition+")";System.out.println(sql);
+        List result=jdbcTemplate.queryForList(sql);
+        return databus.setResponse(result,id_list);
+    }
+
+
     //1.创建队伍
     @RequestMapping("/setgroup")
     public Object setGroup(@RequestParam String email,@RequestParam String info) {
@@ -29,13 +48,14 @@ public class GroupController {
             return databus.setResponse(401, "没有信息");
         }
         try {
-            String sql = "insert into groupinfo(group_name,size,intend_comp,cap_email,member_emails) values(?,?,?,?,?)";
+            String sql = "insert into groupinfo(group_name,size,intend_comp,cap_email,member_emails,chara_point,ori_point) values(?,?,?,?,?,?,?)";
             JSONObject jsonObject = JSON.parseObject(info);
             String group_name = jsonObject.getString("group_name");
             String size = jsonObject.getString("size");
             String intend_comp = jsonObject.getString("intend_comp");
+            String chara_point = jsonObject.getString("chara_point");
 
-            if (group_name == null || size == null || intend_comp == null) {
+            if (group_name == null || size == null || intend_comp == null || chara_point == null) {
                 return databus.setResponse(406, "参数不全");
             }
             if (
@@ -45,12 +65,12 @@ public class GroupController {
                 return databus.setResponse(403, "参数非法");
             }
             try{
-                List res = jdbcTemplate.queryForList("select * from groupinfo where group_name=? and intend_comp=?",new Object[]{group_name,intend_comp});
+                List res = jdbcTemplate.queryForList("select id from groupinfo where group_name=? and intend_comp=?",new Object[]{group_name,intend_comp});
                 if(!res.isEmpty()){
                     return databus.setResponse(401,"该意向比赛中已经存在此名字的队伍");
                 }
 
-                jdbcTemplate.update(sql,new Object[]{group_name,size,intend_comp,email,email});
+                jdbcTemplate.update(sql,new Object[]{group_name,size,intend_comp,email,email,chara_point,chara_point});
 
             } catch (DataAccessException e){
                 System.out.println(e.getMessage());
@@ -88,8 +108,26 @@ public class GroupController {
             return  databus.setResponse(402,"未知错误");
         }
     }
-
-    //4.获得队伍信息,貌似重复了
+    //4.按队伍名+比赛查找队伍
+    @RequestMapping("/search/bynm")
+    public Object getGroupsByNM(@RequestParam String group_name,@RequestParam String comp){
+       try{
+           String sql = "select * from groupinfo where group_name=? and intend_comp=?";
+           List list=jdbcTemplate.queryForList(sql,group_name,comp);
+           return databus.setResponse(list);
+       }        catch (EmptyResultDataAccessException e){
+           return databus.setResponse(405,"出现empty set");
+       }
+       catch (DataAccessException e){
+           System.out.println(e.getMessage());
+           return databus.setResponse(501,"信息处理失败");
+       }
+       catch(Exception e){
+           System.out.println(e.getMessage());
+           return databus.setResponse(402,"未知错误："+e.getMessage());
+       }
+    }
+    //5.获得队伍信息,貌似重复了
     @RequestMapping("/getInfo")
     public Object getGroupInfo(@RequestParam String group_id){
         try{

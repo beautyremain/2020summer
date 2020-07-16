@@ -125,7 +125,6 @@ public class GroupInformController {
             String sql_get_old_id = "select group_id from userinfo where email=?";//原先有的小组id
             String sql_get_old_emails = "select member_emails from groupinfo where id=? and size>member_num";//小组原先有的成员
             try {
-
                 //先拿到目前最大id，方便之后的插入时直接将id值填入main和response属性
                 String old_id = jdbcTemplate.queryForObject(sql_get_old_id, String.class, sender_email);
                 String new_id =  old_id==""?group_id:old_id+","+group_id;//处理之前是否有小组的两种情况

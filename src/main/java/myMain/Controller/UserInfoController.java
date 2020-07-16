@@ -37,11 +37,11 @@ public class UserInfoController {
 
     //为某一用户添加label
     @RequestMapping("/setLabels")
-    public Object setLabels(@RequestParam String email,@RequestParam String labels){
+    public Object setLabels(@RequestParam String email,@RequestParam String labels,@RequestParam String chara_point,@RequestParam String radar_point){
         try {
-            String sql = "update userinfo set label=? where email=?";
+            String sql = "update userinfo set label=? ,chara_point=?,radar_point=?where email=?";
             try {
-                jdbcTemplate.update(sql,new Object[]{labels,email});
+                jdbcTemplate.update(sql,new Object[]{labels,chara_point,radar_point,email});
                 return databus.setResponse("标签上传成功");
 
             } catch (DataAccessException e) {

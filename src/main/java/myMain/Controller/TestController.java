@@ -31,6 +31,10 @@ private static String responseHeader="Access-Control-Allow-Origin";
     @RequestMapping(value="/sql", method=RequestMethod.GET)
     public Object index(@RequestParam String sql) {
         List list=jdbcTemplate.queryForList(sql);
+        System.out.println(list.get(0));
+        System.out.println(list.get(0).getClass());
+        LinkedCaseInsensitiveMap map=(LinkedCaseInsensitiveMap)list.get(0);
+        System.out.println(map.get("id"));
         return databus.setResponse(0,list);
     }
     @RequestMapping("/oper")
@@ -104,15 +108,22 @@ private static String responseHeader="Access-Control-Allow-Origin";
     }
 
     @RequestMapping(value = "/out",method={RequestMethod.GET,RequestMethod.POST})
-    public Object out(HttpSession session){
-        getPy.get();
-        Object usr = session.getAttribute("loginUser");
-        if(usr == null){
-            return session.toString();
+    public Object out(){
+        String type="0";
+        String id="1";
+        String[] id_list=(String[]) getPy.get(type,id);
+
+        String condition="";
+        for(String each : id_list){
+            condition+=each+",";
         }
-        else {
-            return "已登录";
-        }
+
+
+        condition=condition.substring(0,condition.length()-1);
+        String sql = "select * from groupinfo where id in("+condition+")";System.out.println(sql);
+        List result=jdbcTemplate.queryForList(sql);
+
+        return result;
     }
 
 }
