@@ -2,10 +2,8 @@ package myMain.Controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import myMain.aboutPy.getPy;
 import myMain.databus;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +11,6 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +108,7 @@ private static String responseHeader="Access-Control-Allow-Origin";
     public Object out(){
         String type="0";
         String id="1";
-        String[] id_list=(String[]) getPy.get(type,id);
+        String[] id_list=(String[]) getPy.getAlgorithmResult(type,id);
 
         String condition="";
         for(String each : id_list){

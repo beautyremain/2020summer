@@ -29,7 +29,7 @@ public class GroupController {
     //推荐队伍/个人
     @RequestMapping("/getRecommand/{type}")
     public Object getRecommand(@RequestParam String id, @PathVariable String type){
-        String[] id_list=(String[]) getPy.get(type,id);
+        String[] id_list=(String[]) getPy.getAlgorithmResult(type,id);
         String condition="";
         for(String each : id_list){
             condition+=each+",";

@@ -278,6 +278,35 @@ public class NewsController {
         }
 
     }
+    /*
+    author: 郑文宏
+    create time: 2020/7/16 15:50
+    */
+    //取消点赞
+    @RequestMapping("/send/dislike")
+    public Object dislike(@RequestParam String sender_email,@RequestParam String response_id){
+        try{
+            if(sender_email == null || response_id == null) {
+                return databus.setResponse(401, "参数不全");
+            }
+            String sql_updateNews = "update news_info_stream set likes=likes-1 where id =?";
+            jdbcTemplate.update(sql_updateNews,response_id);
+            String sql_insertStream = "delete from inform_table where response_id=? and type=? and sender=?";
+            jdbcTemplate.update(sql_insertStream,new Object[]{response_id,"1",sender_email});
+            return databus.setResponse("取消点赞成功");
+        }
+        catch (EmptyResultDataAccessException e){
+            return databus.setResponse(405,"不存在该信息id");
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(402,"未知错误："+e.getMessage());
+        }
+    }
 
 
 
