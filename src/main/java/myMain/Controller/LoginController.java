@@ -44,7 +44,7 @@ public class LoginController {
             jsonObject.put("messageDetail","用户不存在");
             return jsonObject;
         }
-        String sql_get="select name,nickname from userinfo where email=? and password=?";
+        String sql_get="select id,name,nickname from userinfo where email=? and password=?";
         List result2=jdbcTemplate.queryForList(sql_get,new Object[]{userEmail,password});
         if(result2.isEmpty()){
             jsonObject.put("statusCode",405);

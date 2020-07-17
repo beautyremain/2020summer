@@ -109,11 +109,13 @@ public class RegisterController {
             try {
 
                 jdbcTemplate.update(sql, new Object[]{name, sex, nickname, password, email});
+                List list = jdbcTemplate.queryForList("select id from userinfo where email=?",email);
+                return databus.setResponse(0,list);
             }   catch(DataAccessException e){
                 System.out.println(e.getMessage());
                 return databus.setResponse(500,"信息存入失败");
             }
-            return databus.setResponse(0,"注册成功");
+
         } catch (Exception e){
             System.out.println(e.getMessage());
             return databus.setResponse(402,"未知错误");

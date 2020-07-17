@@ -44,6 +44,65 @@ public class CompetitionController {
             return databus.setResponse(402, "未知错误");
         }
     }
+    //按照比赛里搜寻比赛队伍
+    @RequestMapping("/search")
+    public Object getteam(@RequestParam String intend_comp){
+        if (intend_comp.isEmpty()) {
+            return databus.setResponse(401, "没有参数");
+        }
+        try {
+            String sql = "select * from  `groupinfo` where intend_comp=? ";
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,intend_comp);
+            if (list.isEmpty()) {
+                return databus.setResponse("搜索不到比赛队伍");
+            } else {
+                return databus.setResponse(list);
+            }
+        }catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e) {
+            return databus.setResponse(402, "未知错误");
+        }
+    }
+    //点击出现所有比赛名字
+    @RequestMapping("/allcompetition")
+    public Object allcompetition(){
+        try {
+            String sql = "select competname from `competitioninfo` ";
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            if (list.isEmpty()) {
+                return databus.setResponse("暂无比赛资讯");
+            } else {
+                return databus.setResponse(list);
+            }
+        }catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+    }
+    //点击出现所有比赛简介
+    @RequestMapping("/competitiondetail")
+    public Object competitiondetail(){
+        try {
+            String sql = "select competname,heat_number,reg_number,team_number,competstate,begin_time from `competitioninfo` ";
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            if (list.isEmpty()) {
+                return databus.setResponse("无简介");
+            } else {
+                return databus.setResponse(list);
+            }
+        }catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+    }
+    /*
+    author: BeautyRemain（程季康）
+    create time: 2020/7/17 13:26
+*/
+    //标记感兴趣的比赛
     @RequestMapping("/markcomp")
     public Object markCompetition(@RequestParam String email,@RequestParam String compname){
         try{

@@ -26,7 +26,7 @@ public class UserInfoController {
     @RequestMapping("/getLabels")
     public Object getLabels(){
         try {
-            String sql = "select label_name,field from label_info";
+            String sql = "select label_name,field,description from label_info";
             List result = jdbcTemplate.queryForList(sql);
             return databus.setResponse(result);
         } catch (Exception e){
@@ -64,6 +64,19 @@ public class UserInfoController {
             return  databus.setResponse(402,"未知错误");
         }
 
+    }
+    @RequestMapping("/setpro")
+    public Object setPro(@RequestParam String profile,@RequestParam String email){
+        try {
+            if (profile != null || email != null) {
+                jdbcTemplate.update("update userinfo set profile=? where email=?", new Object[]{profile, email});
+                return databus.setResponse("上传成功");
+            }
+            return databus.setResponse(402, "未知错误");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return  databus.setResponse(402, "未知错误");
+        }
     }
     //保存用户详细信息
     @RequestMapping("/setinfo")
