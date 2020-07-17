@@ -6,6 +6,7 @@ import myMain.aboutSearch.SingleSearch;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,69 @@ public class UserInfoController {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    SingleSearch singleSearch;
 
+    //新 关注和取关：
+    @RequestMapping("/removeAtten")
+    public Object removeAttention(@RequestParam String sender_email,@RequestParam String attention_email){
+        try{
+            if(attention_email == null || sender_email == null ){
+                return databus.setResponse(401, "参数不全");
+            }
+            String sql_getOldAttention = "select attention from userinfo where email=?";
+            String sql_changeUserInfo = "update userinfo set attention=? where email=?";
+            String old=jdbcTemplate.queryForObject(sql_getOldAttention,String.class,sender_email);
+            if(old == null || old.equals("")){
+                return databus.setResponse("用户没有标记感兴趣");
+            }
+            else{
+                String newComps=databus.deleteKeyword(old,attention_email);
+                jdbcTemplate.update(sql_changeUserInfo,new Object[]{newComps,sender_email});
+                String sql_deleteInform="delete from inform_table where sender=? and type=4 and response_id=?";
+                String Attention_id=jdbcTemplate.queryForObject("select id from userinfo where email=?",String.class,attention_email);
+                jdbcTemplate.update(sql_deleteInform,new Object[]{sender_email,Attention_id});
+                return databus.setResponse("取消关注成功");
+            }
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return databus.setResponse(402,"未知错误");
+        }
+    }
+    @RequestMapping("/setAtten")
+    public Object setAttention(@RequestParam String sender_email,@RequestParam String attention_email){
+        try{
+            if(attention_email == null || sender_email == null ){
+                return databus.setResponse(401, "参数不全");
+            }
+            String sql_changeUserInfo = "update userinfo set attention=? where email=?";
+            String sql_getOldAttention = "select attention from userinfo where email=?";
+            String newAttentionEmail=attention_email;
+            String old=jdbcTemplate.queryForObject(sql_getOldAttention,String.class,sender_email);
+            if(old!=null&&!old.equals(""))
+                newAttentionEmail=old+","+newAttentionEmail;
+            String Attention_id=jdbcTemplate.queryForObject("select id from userinfo where email=?",String.class,attention_email);
+            jdbcTemplate.update(sql_changeUserInfo,new Object[]{newAttentionEmail,sender_email});
+            String sql_insertInform="insert into inform_table(response_id,sender,message,type) values(?,?,'attention',4)";
+            jdbcTemplate.update(sql_insertInform,new Object[]{Attention_id,sender_email});
+            return databus.setResponse("关注成功");
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return databus.setResponse(402,"未知错误");
+        }
+    }
     //获得所有的label
     @RequestMapping("/getLabels")
     public Object getLabels(){
@@ -65,6 +128,7 @@ public class UserInfoController {
         }
 
     }
+    //为某一用户添加简介
     @RequestMapping("/setpro")
     public Object setPro(@RequestParam String profile,@RequestParam String email){
         try {
@@ -116,8 +180,7 @@ public class UserInfoController {
 
     }
 
-    @Autowired
-    SingleSearch singleSearch;
+
 
     //根据标签查找用户
     @RequestMapping("/search/bylabels")

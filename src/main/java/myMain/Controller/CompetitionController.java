@@ -113,10 +113,41 @@ public class CompetitionController {
             String sql_updateNew="update userinfo set mark_comp=? where email=?";
             String newNames=compname;
             String old=jdbcTemplate.queryForObject(sql_getOld,String.class,email);
-            if(old!=null)
+            if(old!=null&&!old.equals(""))
                 newNames=old+","+newNames;
             jdbcTemplate.update(sql_updateNew,new Object[]{newNames,email});
             return databus.setResponse("感兴趣成功");
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e) {
+            return databus.setResponse(402, "未知错误");
+        }
+    }
+    //取消标记感兴趣的比赛
+    @RequestMapping("/markremove")
+    public Object deleteMarkCompetition(@RequestParam String email,@RequestParam String compname){
+        try{
+            if(email==null||compname==null){
+                return databus.setResponse(401, "缺少参数");
+            }
+            String sql_getOld="select mark_comp from userinfo where email=? and mark_comp like '%?%'";
+            String sql_updateNew="update userinfo set mark_comp=? where email=?";
+
+            String old=jdbcTemplate.queryForObject(sql_getOld,String.class,new Object[]{email,compname});
+            if(old == null || old.equals("")){
+                return databus.setResponse("用户没有标记感兴趣");
+            }
+            else{
+                String newComps=databus.deleteKeyword(old,compname);
+                jdbcTemplate.update(sql_updateNew,new Object[]{newComps,email});
+                return databus.setResponse("取消感兴趣成功");
+            }
+        }
+        catch (EmptyResultDataAccessException e){
+            return databus.setResponse("用户没有标记感兴趣");
         }
         catch (DataAccessException e){
             System.out.println(e.getMessage());

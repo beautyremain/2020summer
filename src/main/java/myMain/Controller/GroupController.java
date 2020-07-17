@@ -74,7 +74,16 @@ public class GroupController {
             return databus.setResponse(402,"未知错误："+e.getMessage());
         }
     }
-
+    //新 根据用户邮箱获得其为队长的小组的name,intend_comp,cap
+    @RequestMapping("/getgroup")
+    public Object getUserLeadGroup(@RequestParam String user_email){
+        try{
+            return singleSearch.searchForList("select group_name,intend_comp,cap_email from groupinfo where cap_email=?",user_email);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return databus.setResponse("未知错误");
+        }
+    }
     //1.创建队伍
     @RequestMapping("/setgroup")
     public Object setGroup(@RequestParam String email,@RequestParam String info) {

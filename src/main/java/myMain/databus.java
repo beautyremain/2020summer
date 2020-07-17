@@ -14,7 +14,21 @@ public class databus {
     public static final int RESPONSE_MAX_DYNAMICS_NUMBER = 10;
     public static final int HEAT_PER_PRESON = 60;
 
-
+    public static String deleteKeyword(String old,String keyword){
+        String[] oldComps=old.split(",");
+        String newWord="";
+        for(String each:oldComps){
+            if(each.equals(keyword)){
+                continue;
+            }
+            else{
+                newWord+=each+",";
+            }
+        }
+        if(newWord.length()>0)
+            newWord=newWord.substring(0,newWord.length()-1);
+        return newWord;
+    }
     //生成响应包
     public static Object setResponse(int statusCode,Object messageDetail){
         JSONObject jsonObject = new JSONObject();
