@@ -25,7 +25,7 @@ def main(type,userid):
     # res=cursor.execute(sql)
     # ret3 = cursor.fetchall()
     sql_getTarget=""
-    if type==0:
+    if type == "0":
         sql_getTarget="select chara_point from userinfo where id=%s"
     else:
         sql_getTarget="select chara_point from groupinfo where id=%s"
@@ -34,7 +34,7 @@ def main(type,userid):
     target=list(map(int,cursor.fetchone()[0].split(",")))
     #print("target:",target)
 
-    if type == 0:
+    if type == "0":
         sql_getGroup = "select group_id from userinfo where id=%s"
         cursor.execute(sql_getGroup, userid)
         group_list = cursor.fetchone()[0]
@@ -52,28 +52,34 @@ def main(type,userid):
             reslist.append(list(map(int,temp)))
         history=np.array(reslist)
     #print("history:",history)
+
+    #到此正确无误
     sql_getAllGroupChara=""
-    if type == 0:
-        sql_getAllGroupChara="select chara_point from groupinfo where sign_state=0"
+    if type == "0":
+        sql_getAllGroupChara="select chara_point from groupinfo "
     else:
-        sql_getAllGroupChara="select chara_point from userinfo"
+        sql_getAllGroupChara = "select chara_point from userinfo "
     cursor.execute(sql_getAllGroupChara)
     res=cursor.fetchall()
     reslist = []
-    for i in range(2):
+    #print("res:",res)
+    for i in range(len(res)):
+        if res[i][0]==None:
+            continue
         temp = res[i][0].split(",")
         reslist.append(list(map(int, temp)))
     candidate_list = np.array(reslist)
     #print("candidate_list:",candidate_list)
-    sql_getId=""
-    if type == 0:
-        sql_getId = "select id from groupinfo where sign_state=0"
+    sql_getId = ""
+    if type == "0":
+        sql_getId = "select id from groupinfo"
     else:
-        sql_getId = "select id from userinfo"
+        sql_getId = "select id from userinfo where chara_point!='NULL'"
+
     cursor.execute(sql_getId)
     anslist=[]
     res=cursor.fetchall()
-    #print(res[1][0])
+    #print(res)
     for i in range(len(res)):
         anslist.append(res[i][0])
         #list(map(int,cursor.fetchall()))
@@ -99,7 +105,7 @@ def main(type,userid):
 
     result1=step1(candidate_list,target)#初始积分
     # print("result1:",result1)
-    if type == 0 and len(history)>0:
+    if type == "0" and len(history)>0:
         result2=step3(result1,history)#新积分
         #print("result2:",result2)
         result1[:,0] += result2[0]
@@ -107,6 +113,8 @@ def main(type,userid):
     result1=result1[result1[:,0].argsort()]#排序
     order_id=result1[:,1].astype('int32').tolist()
     order_id.reverse()
+    if len(order_id)>10:
+        order_id=order_id[0:9]
     print(order_id)#降序排列的推荐id
 
 if __name__ == '__main__':

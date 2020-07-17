@@ -25,7 +25,6 @@ public class UserInfoController {
     //获得所有的label
     @RequestMapping("/getLabels")
     public Object getLabels(){
-        JSONObject jsonObject = new JSONObject();
         try {
             String sql = "select label_name,field from label_info";
             List result = jdbcTemplate.queryForList(sql);
@@ -34,6 +33,17 @@ public class UserInfoController {
             return databus.setResponse(402,"未知错误");
         }
     }
+    @RequestMapping("/getField")
+    public Object getField(){
+        try {
+            String sql = "select field from label_info group by field";
+            List result = jdbcTemplate.queryForList(sql);
+            return databus.setResponse(result);
+        } catch (Exception e){
+            return databus.setResponse(402,"未知错误");
+        }
+    }
+
 
     //为某一用户添加label
     @RequestMapping("/setLabels")

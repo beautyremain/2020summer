@@ -38,11 +38,42 @@ public class GroupController {
             condition+=each+",";
         }
         condition=condition.substring(0,condition.length()-1);
-        String sql = "select * from groupinfo where id in("+condition+")";System.out.println(sql);
+        String tableName = type.equals("0") ? "groupinfo":"userinfo";
+        String sql = "select * from "+tableName+" where id in("+condition+")";System.out.println(sql);
+        System.out.println("getRecommandinfo:"+sql);
         List result=jdbcTemplate.queryForList(sql);
         return databus.setResponse(result,id_list);
     }
-
+    //新 队伍修改size，特征数值或意向比赛
+    @RequestMapping("/editInfo")
+    public Object editInfo(@RequestParam String sender_email,@RequestParam String size,@RequestParam String chara_point,@RequestParam String intend_comp,@RequestParam String id){
+        try{
+            if(sender_email == null || size == null || chara_point==null || intend_comp==null || id == null){
+                return databus.setResponse(401, "参数不全");
+            }
+            if(databus.stringIllegal(intend_comp)||databus.stringIllegal(size)){
+                return databus.setResponse(403, "参数非法");
+            }
+            String sql_check = "select * from groupinfo where id=? and cap_email=? and member_num<=?";
+            List checkResult = jdbcTemplate.queryForList(sql_check,new Object[]{id,sender_email,size});
+            if(checkResult.isEmpty()){
+                return databus.setResponse("身份有误或修改的小组大小小于已有人数");
+            }
+            String sql="update groupinfo set chara_point=?,size=?,intend_comp=? where cap_email=? and id=?";
+            jdbcTemplate.update(sql,new Object[]{chara_point,size,intend_comp,sender_email,id});
+            return databus.setResponse("修改成功");
+        }        catch (EmptyResultDataAccessException e){
+            return databus.setResponse(405,"该用户没有关注");
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(402,"未知错误："+e.getMessage());
+        }
+    }
 
     //1.创建队伍
     @RequestMapping("/setgroup")
@@ -142,7 +173,23 @@ public class GroupController {
         }
     }
 
-
+    @RequestMapping("/join")
+    public Object joinCompetition(@RequestParam String sender_email,@RequestParam String group_id){
+       try {
+           if(sender_email == null || group_id == null){
+               return databus.setResponse(401, "参数不全");
+           }
+           List list=jdbcTemplate.queryForList("select * from groupinfo where cap_email=? and group_id=?",new Object[]{sender_email,group_id});
+           if(list.isEmpty()){
+               return databus.setResponse(405,"权限有误或小组不存在");
+           }
+           jdbcTemplate.update("update groupinfo set siginstat=1 where cap_email=? and group_id=?",new Object[]{sender_email,group_id});
+           return databus.setResponse("加入成功");
+        }   catch (Exception e){
+            System.out.println(e.getMessage());
+            return  databus.setResponse(402,"未知错误");
+        }
+    }
 
 
 
