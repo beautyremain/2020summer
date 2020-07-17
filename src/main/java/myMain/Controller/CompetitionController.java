@@ -7,6 +7,7 @@ package myMain.Controller;
 import myMain.databus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,5 +44,27 @@ public class CompetitionController {
             return databus.setResponse(402, "未知错误");
         }
     }
-
+    @RequestMapping("/markcomp")
+    public Object markCompetition(@RequestParam String email,@RequestParam String compname){
+        try{
+            if(email==null||compname==null){
+                return databus.setResponse(401, "缺少参数");
+            }
+            String sql_getOld="select mark_comp from userinfo where email=?";
+            String sql_updateNew="update userinfo set mark_comp=? where email=?";
+            String newNames=compname;
+            String old=jdbcTemplate.queryForObject(sql_getOld,String.class,email);
+            if(old!=null)
+                newNames=old+","+newNames;
+            jdbcTemplate.update(sql_updateNew,new Object[]{newNames,email});
+            return databus.setResponse("感兴趣成功");
+        }
+        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e) {
+            return databus.setResponse(402, "未知错误");
+        }
+    }
 }

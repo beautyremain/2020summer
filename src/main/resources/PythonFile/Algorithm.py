@@ -52,8 +52,11 @@ def main(type,userid):
             reslist.append(list(map(int,temp)))
         history=np.array(reslist)
     #print("history:",history)
-
-    sql_getAllGroupChara="select chara_point from groupinfo "
+    sql_getAllGroupChara=""
+    if type == 0:
+        sql_getAllGroupChara="select chara_point from groupinfo where sign_state=0"
+    else:
+        sql_getAllGroupChara="select chara_point from userinfo"
     cursor.execute(sql_getAllGroupChara)
     res=cursor.fetchall()
     reslist = []
@@ -62,8 +65,11 @@ def main(type,userid):
         reslist.append(list(map(int, temp)))
     candidate_list = np.array(reslist)
     #print("candidate_list:",candidate_list)
-
-    sql_getId = "select id from groupinfo"
+    sql_getId=""
+    if type == 0:
+        sql_getId = "select id from groupinfo where sign_state=0"
+    else:
+        sql_getId = "select id from userinfo"
     cursor.execute(sql_getId)
     anslist=[]
     res=cursor.fetchall()

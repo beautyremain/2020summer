@@ -45,6 +45,23 @@ public class InformController {
                 sql = " select * from news_info_stream where type='3' and id" + g + "? and response_id in (select id from news_info_stream where sender = ? or sender like '%\"cap\":\"" + email + "\"%' ) order by id desc limit ?";
                 result = jdbcTemplate.queryForList(sql, new Object[]{i, email, databus.RESPONSE_MAX_DYNAMICS_NUMBER});
             }
+            else if(type.equals("2")){
+                String sql_getUserMarkGroup = "select mark_comp from userinfo where email=?";
+                try {
+                    String MarkComp=jdbcTemplate.queryForObject(sql_getUserMarkGroup,String.class,email);
+                    String[] Comps=MarkComp.split(",");
+                    String condition="";
+                    for(String each:Comps){
+                        condition+="'"+each+"',";
+                    }
+                    condition=condition.substring(0,condition.length()-1);
+                    sql="select * from inform_table where type=2 and id"+g+i+" and sender in ("+condition+") order by id desc limit "+databus.RESPONSE_MAX_DYNAMICS_NUMBER;
+                    System.out.println("edit sql:"+sql);
+                    result=jdbcTemplate.queryForList(sql);
+                } catch (EmptyResultDataAccessException e){
+                    return databus.setResponse("没有感兴趣的比赛");
+                }
+            }
             else{
                 sql = "select * from inform_table where type=? and id"+g+"? and (response_id in (select id from news_info_stream where sender = ? or sender like '%\"cap\":\"" + email + "\"%' ) or response_id='0') order by id desc limit ?";
                 result =jdbcTemplate.queryForList(sql,new Object[]{type,i,email,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
