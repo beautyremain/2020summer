@@ -29,6 +29,15 @@ public class databus {
             newWord=newWord.substring(0,newWord.length()-1);
         return newWord;
     }
+    public static String updateKeyword(String old,String keyword){
+        if(old.equals("")||old==null){
+            return keyword;
+        }
+        else{
+            return old+","+keyword;
+        }
+
+    }
     //生成响应包
     public static Object setResponse(int statusCode,Object messageDetail){
         JSONObject jsonObject = new JSONObject();

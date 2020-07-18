@@ -56,6 +56,7 @@ public class UserInfoController {
             System.out.println(e.getMessage());
             return databus.setResponse(402,"未知错误");
         }
+        
     }
     @RequestMapping("/setAtten")
     public Object setAttention(@RequestParam String sender_email,@RequestParam String attention_email){

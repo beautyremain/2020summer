@@ -22,7 +22,7 @@ public class InformController {
     //goal : getNew:0,getHistory:1
     private  static final String getNew="0";
     private  static final  String getHistory="1";
-    //type:0为系统通知,1为点赞通知,2为比赛通知,3为评论通知,4为点赞通知
+    //type:0为系统通知,1为点赞通知,2为比赛通知,3为评论通知,4为点赞通知,5为老师收到邀请，6为学生查看回执
     @RequestMapping("/all/{type}")
     //7.评论的通知 组队信息通知队长 暂时不考虑基于websocket的全双工实时信息传输，依然使用http模式
     public Object inform(@RequestParam String email, @RequestParam String newest_id, @RequestParam String oldest_id, @RequestParam String goal, @PathVariable String type){
@@ -64,6 +64,17 @@ public class InformController {
             }
             else if(type.equals("4")){
                 sql="select * from inform_table where type=4 and id"+g+i+" and response_id in (select id from userinfo where email=?) order by id desc limit "+databus.RESPONSE_MAX_DYNAMICS_NUMBER;
+                result=jdbcTemplate.queryForList(sql,email);
+            }
+            else if(type.equals("5")){
+                String teacher_id = jdbcTemplate.queryForObject("select id from userinfo where email=?",String.class,email);
+                sql="select group_id,message,state from invite_stream where id"+g+i+" and teacher_id=? order by state,id desc limit "+databus.RESPONSE_MAX_DYNAMICS_NUMBER;
+                result=jdbcTemplate.queryForList(sql,teacher_id);
+
+            }
+            else if(type.equals("6")){
+
+                sql="select teacher_id,group_id,reply,state from invite_stream where id"+g+i+" and group_id in (select id from groupinfo where cap_email=?) order by id desc limit "+databus.RESPONSE_MAX_DYNAMICS_NUMBER;
                 result=jdbcTemplate.queryForList(sql,email);
             }
             else{
