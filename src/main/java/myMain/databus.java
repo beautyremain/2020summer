@@ -36,7 +36,6 @@ public class databus {
         else{
             return old+","+keyword;
         }
-
     }
     //生成响应包
     public static Object setResponse(int statusCode,Object messageDetail){

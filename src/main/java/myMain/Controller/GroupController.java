@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 
 //组队有关的接口
@@ -181,18 +183,24 @@ public class GroupController {
             return  databus.setResponse(402,"未知错误");
         }
     }
-
+    //队伍参加比赛
     @RequestMapping("/join")
     public Object joinCompetition(@RequestParam String sender_email,@RequestParam String group_id){
        try {
            if(sender_email == null || group_id == null){
                return databus.setResponse(401, "参数不全");
            }
-           List list=jdbcTemplate.queryForList("select * from groupinfo where cap_email=? and group_id=?",new Object[]{sender_email,group_id});
+           List list=jdbcTemplate.queryForList("select * from groupinfo where cap_email=? and id=?",new Object[]{sender_email,group_id});
            if(list.isEmpty()){
                return databus.setResponse(405,"权限有误或小组不存在");
            }
-           jdbcTemplate.update("update groupinfo set siginstat=1 where cap_email=? and group_id=?",new Object[]{sender_email,group_id});
+           LinkedCaseInsensitiveMap map=(LinkedCaseInsensitiveMap)list.get(0);
+           int member_num= Integer.parseInt( map.get("member_num").toString());
+           String competName=(String)map.get("intend_comp");
+           System.out.println(competName);
+           String sql="update competitioninfo set reg_number=reg_number+?,team_number=team_number+1 where competname=?";
+           jdbcTemplate.update(sql,new Object[]{member_num,competName});
+           jdbcTemplate.update("update groupinfo set sign_state=1 where cap_email=? and id=?",new Object[]{sender_email,group_id});
            return databus.setResponse("加入成功");
         }   catch (Exception e){
             System.out.println(e.getMessage());
