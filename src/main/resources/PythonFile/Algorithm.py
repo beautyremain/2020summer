@@ -42,7 +42,7 @@ def main(type,userid):
         condition = ""
         for each in group_list:
             condition += str(each) + ","
-        sql_getHistory = "select ori_point from groupinfo where id in(" + condition[:-1] + ") "
+        sql_getHistory = "select ori_point from groupinfo where sign_state=0 and id in(" + condition[:-1] + ") "
         print(sql_getHistory)
         cursor.execute(sql_getHistory)
         res = cursor.fetchall()
@@ -53,12 +53,12 @@ def main(type,userid):
         history=np.array(reslist)
     #print("history:",history)
 
-    #到此正确无误
+
     sql_getAllGroupChara=""
     if type == "0":
-        sql_getAllGroupChara="select chara_point from groupinfo "
+        sql_getAllGroupChara="select chara_point from groupinfo where sign_state=0 "
     else:
-        sql_getAllGroupChara = "select chara_point from userinfo "
+        sql_getAllGroupChara = "select chara_point from userinfo where trust<50"
     cursor.execute(sql_getAllGroupChara)
     res=cursor.fetchall()
     reslist = []
@@ -72,9 +72,9 @@ def main(type,userid):
     #print("candidate_list:",candidate_list)
     sql_getId = ""
     if type == "0":
-        sql_getId = "select id from groupinfo"
+        sql_getId = "select id from groupinfo where sign_state=0"
     else:
-        sql_getId = "select id from userinfo where chara_point!='NULL'"
+        sql_getId = "select id from userinfo where chara_point!='NULL' and trust<50"
 
     cursor.execute(sql_getId)
     anslist=[]

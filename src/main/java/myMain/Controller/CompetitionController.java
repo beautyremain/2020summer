@@ -157,4 +157,19 @@ public class CompetitionController {
             return databus.setResponse(402, "未知错误");
         }
     }
+    //按比赛获得指导老师
+    @RequestMapping("/getTeacher")
+    public Object getTeacher(@RequestParam String comp_name){
+        try{
+            String sql="select id,name,email,userpic from userinfo where id in(select user_id from teacher_list where comp_names like '%"+comp_name+"%')";
+            List list=jdbcTemplate.queryForList(sql);
+            return  databus.setResponse(list);
+        }        catch (DataAccessException e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(501,"信息处理失败");
+        }
+        catch (Exception e) {
+            return databus.setResponse(402, "未知错误");
+        }
+    }
 }

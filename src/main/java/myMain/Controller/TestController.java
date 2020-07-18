@@ -31,7 +31,7 @@ private static String responseHeader="Access-Control-Allow-Origin";
         System.out.println(list.get(0));
         System.out.println(list.get(0).getClass());
         LinkedCaseInsensitiveMap map=(LinkedCaseInsensitiveMap)list.get(0);
-        System.out.println(map.get("id"));
+        System.out.println(map.get("judge_point")=="");
         return databus.setResponse(0,list);
     }
     @RequestMapping("/oper")

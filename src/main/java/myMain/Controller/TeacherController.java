@@ -102,12 +102,14 @@ public class TeacherController {
         try{
             String sql="update competitioninfo set competstate=?,detail=? where competname=?";
             jdbcTemplate.update(sql,new Object[]{competstate,detail,comp_name});
+            //使已参加比赛的小组变成进行中，没报名的作废
             if(competstate.equals("2")){
                 String sql_updateGroupFlag="update groupinfo set sign_state=2 where sign_state=1 and intend_comp=?";
                 jdbcTemplate.update(sql_updateGroupFlag,comp_name);
                 sql_updateGroupFlag="update groupinfo set sign_state=-1 where sign_state=0 and intend_comp=?";
                 jdbcTemplate.update(sql_updateGroupFlag,comp_name);
             }
+            //使进行中的变成结束
             if(competstate.equals("3")){
                 String sql_updateGroupFlag="update groupinfo set sign_state=3 where sign_state=2 and intend_comp=?";
                 jdbcTemplate.update(sql_updateGroupFlag,comp_name);

@@ -39,6 +39,9 @@ public class GetPy {
         try {
             String line = null;
             Process process = Runtime.getRuntime().exec(args);
+            for(String each:args){
+                System.out.println("args:"+each);
+            }
             System.out.println(process);
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream(),"GBK"));
             List<String> lines = new ArrayList<String>();
@@ -56,6 +59,16 @@ public class GetPy {
             System.out.println(e.getMessage());
             return null;
         }
+    }
+    //欧式距离
+    public static String getRelativeDistance(String self_string,String other_string){
+        String Path=System.getProperty("user.dir")+ databus.PYTHON_PATH+"/distanceJudge.py";
+        String[] args = new String[]{"python",Path,self_string,other_string};
+        for(String each:args){
+            System.out.println("args:"+each);
+        }
+        String ans=pyOut(args).get(0);
+        return ans;
     }
     //智能搜索
     public Object getSearchResult(String keySentence){

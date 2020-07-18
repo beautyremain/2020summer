@@ -58,6 +58,7 @@ public class UserInfoController {
         }
         
     }
+    //添加关注
     @RequestMapping("/setAtten")
     public Object setAttention(@RequestParam String sender_email,@RequestParam String attention_email){
         try{
@@ -97,6 +98,7 @@ public class UserInfoController {
             return databus.setResponse(402,"未知错误");
         }
     }
+    //获取所有的领域
     @RequestMapping("/getField")
     public Object getField(){
         try {
