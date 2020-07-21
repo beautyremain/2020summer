@@ -133,15 +133,16 @@ public class CompetitionController {
             if(email==null||compname==null){
                 return databus.setResponse(401, "缺少参数");
             }
-            String sql_getOld="select mark_comp from userinfo where email=? and mark_comp like '%?%'";
+            String sql_getOld="select mark_comp from userinfo where email=? and mark_comp like '%"+compname+"%'";
             String sql_updateNew="update userinfo set mark_comp=? where email=?";
 
-            String old=jdbcTemplate.queryForObject(sql_getOld,String.class,new Object[]{email,compname});
+            String old=jdbcTemplate.queryForObject(sql_getOld,String.class,new Object[]{email});
             if(old == null || old.equals("")){
                 return databus.setResponse("用户没有标记感兴趣");
             }
             else{
                 String newComps=databus.deleteKeyword(old,compname);
+                System.out.println(newComps);
                 jdbcTemplate.update(sql_updateNew,new Object[]{newComps,email});
                 return databus.setResponse("取消感兴趣成功");
             }
@@ -169,6 +170,36 @@ public class CompetitionController {
             return databus.setResponse(501,"信息处理失败");
         }
         catch (Exception e) {
+            return databus.setResponse(402, "未知错误");
+        }
+    }
+    //按学生获得参加比赛
+    @RequestMapping("/user/getComp")
+    public Object userGetCompetition(@RequestParam String email){
+        try{
+            String sql="select group_id from userinfo where email=?";
+            String group_id_string=jdbcTemplate.queryForObject(sql,String.class,email);
+            if(group_id_string.equals("")||group_id_string==null){
+                return databus.setResponse(401,"出现空集,该学生未参加任何比赛");
+            }
+            String[] group_id_arr = group_id_string.split(",");
+            String condition = "";
+            for(String each :group_id_arr){
+                condition+=each+",";
+            }
+            condition=condition.substring(0,condition.length()-1);
+            String sql_getComp="select intend_comp from groupinfo where id in ("+condition+") and sign_state in (1,2,3)";
+            System.out.println("sql_getComp="+sql_getComp);
+            List list = jdbcTemplate.queryForList(sql_getComp);
+            return databus.setResponse(list);
+        }
+        catch (EmptyResultDataAccessException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return databus.setResponse(401,"出现空集,该学生未参加任何比赛");
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
             return databus.setResponse(402, "未知错误");
         }
     }

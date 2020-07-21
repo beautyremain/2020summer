@@ -215,4 +215,15 @@ public class UserInfoController {
             return databus.setResponse(402,"未知错误");
         }
     }
+    //根据id查找用户
+    @RequestMapping("/search/byId")
+    public Object searchUserById(@RequestParam String id){
+        try{
+            String  sql = "select * from userinfo where id=?";
+            return singleSearch.searchForList(sql,id);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return databus.setResponse(402,"未知错误");
+        }
+    }
 }

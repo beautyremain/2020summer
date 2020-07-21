@@ -201,6 +201,7 @@ public class GroupController {
            String sql="update competitioninfo set reg_number=reg_number+?,team_number=team_number+1 where competname=?";
            jdbcTemplate.update(sql,new Object[]{member_num,competName});
            jdbcTemplate.update("update groupinfo set sign_state=1 where cap_email=? and id=?",new Object[]{sender_email,group_id});
+           //jdbcTemplate.update("insert into sign_in_stream(competition_name,)")
            return databus.setResponse("加入成功");
         }   catch (Exception e){
             System.out.println(e.getMessage());

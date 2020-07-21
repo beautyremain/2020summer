@@ -38,6 +38,9 @@ public class GroupInformController {
                 return  databus.setResponse(403,"参数非法");
             }
             String sql = "insert into apply_stream(group_id,response_id,message,sender,type) values(?,?,?,?,?)";
+            if(!jdbcTemplate.queryForList("select * from apply_stream where group_id=? and type=0 and sender=?",new Object[]{group_id,sender_email}).isEmpty()){
+                return databus.setResponse("你已经发送过申请了");
+            }
             jdbcTemplate.update(sql,new Object[]{group_id,group_id,message,sender_email,0});
             return databus.setResponse("提交成功");
         }
@@ -91,6 +94,9 @@ public class GroupInformController {
             if(databus.stringIllegal(message)){
                 return  databus.setResponse(403,"参数非法");
             }
+            if(!jdbcTemplate.queryForList("select * from apply_stream where group_id=? and response_id=?",new Object[]{group_id,response_id}).isEmpty()){
+                return databus.setResponse("你已经发送过回执了");
+            }
             String sql_updateApplyStatus = "update apply_stream set status = ? where id=?";
             jdbcTemplate.update(sql_updateApplyStatus,new Object[]{status,response_id});
 
@@ -116,6 +122,9 @@ public class GroupInformController {
     @RequestMapping("/joinGroup")
     public Object joinAndConfirmGroup(@RequestParam String group_id, @RequestParam String sender_email,@RequestParam String response_id,@RequestParam String status,@RequestParam String message){
         try {
+            if(!jdbcTemplate.queryForList("select * from apply_stream where group_id=? and response_id=?",new Object[]{group_id,response_id}).isEmpty()){
+                return databus.setResponse("你已经发送过回执确认了");
+            }
             String sql_updateResponse="update apply_stream set status=? where id=?";
             jdbcTemplate.update(sql_updateResponse,new Object[]{status,response_id});
             if(status.equals("1")){

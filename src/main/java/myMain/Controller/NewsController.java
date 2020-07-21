@@ -154,12 +154,12 @@ public class NewsController {
             try {
                 //分类检索
                 if (goal.equals(getNew)) {
-                    String sql = "select * from news_info_stream where id>? and type=? order by id desc limit ?";
+                    String sql = "select * from news_info_stream where id>? and type=? order by id and isdeleted=0 desc limit ?";
                     List result = jdbcTemplate.queryForList(sql,new Object[]{newest_id,type,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
                     return databus.setResponse(result);
                 }
                 else if(goal.equals(getHistory)){
-                    String sql = "select * from news_info_stream where id<? and type=? order by id desc limit ?";
+                    String sql = "select * from news_info_stream where id<? and type=? and isdeleted=0 order by id desc limit ?";
                     List result = jdbcTemplate.queryForList(sql,new Object[]{oldest_id,type,databus.RESPONSE_MAX_DYNAMICS_NUMBER});
                     return databus.setResponse(result);
                 }

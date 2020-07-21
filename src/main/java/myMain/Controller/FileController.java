@@ -29,7 +29,7 @@ public class FileController {
     //文件上传
     @Autowired
     JdbcTemplate jdbcTemplate;
-    //type: imgIcon\imgDynamic
+    //type: imgIcon\imgDynamic\imgGroup
     //图像上传控制器
     @RequestMapping(value = "/ImgUpload/{type}",method = RequestMethod.POST)
     public Object getFile(@RequestParam MultipartFile file, @RequestParam String target, Model model, @PathVariable String type) {
@@ -38,7 +38,14 @@ public class FileController {
         }
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        String path_dir = type.equals("imgIcon")? databus.ICON_IMG_BASIC_PATH:databus.DYNAMIC_IMG_BASIC_PATH;
+        String path_dir = null;//type.equals("imgIcon")? databus.ICON_IMG_BASIC_PATH:databus.DYNAMIC_IMG_BASIC_PATH;
+        if(type.equals("imgIcon")){
+            path_dir=databus.ICON_IMG_BASIC_PATH;
+        }else if(type.equals("imgDynamic")){
+            path_dir=databus.DYNAMIC_IMG_BASIC_PATH;
+        }else{
+            path_dir=databus.GROUP_IMG_BASIC_PATH;
+        }
         String filePath = System.getProperty("user.dir")+path_dir;
         fileName = UUID.randomUUID() + suffixName; // 新文件名
         File dest = new File(filePath +""+fileName);
@@ -57,7 +64,14 @@ public class FileController {
         model.addAttribute("filename", filename);
 
         //新上传的图片根据需求存入数据库
-        String  sql = type.equals("imgIcon")?"update userinfo set userpic=? where email=? ":"update news_info_stream set pic_name=? where id=? ";
+        String  sql = null;//type.equals("imgIcon")?"update userinfo set userpic=? where email=? ":"update news_info_stream set pic_name=? where id=? ";
+        if(type.equals("imgIcon")){
+            sql="update userinfo set userpic=? where email=? ";
+        }else if(type.equals("imgDynamic")){
+            sql="update news_info_stream set pic_name=? where id=? ";
+        }else{
+            sql="update groupinfo set pic_name=? where id=? ";
+        }
         try {
             jdbcTemplate.update(sql,new Object[]{fileName,target});
             return databus.setResponse(0,"success");
@@ -71,7 +85,14 @@ public class FileController {
     public Object responseFile(@RequestParam String imgName,@PathVariable String type){
         try {
             //按照文件名和type拼接绝对路径
-            String path_dir = type.equals("imgIcon") ? databus.ICON_IMG_BASIC_PATH : databus.DYNAMIC_IMG_BASIC_PATH;
+            String path_dir = null;//type.equals("imgIcon") ? databus.ICON_IMG_BASIC_PATH : databus.DYNAMIC_IMG_BASIC_PATH;
+            if(type.equals("imgIcon")){
+                path_dir=databus.ICON_IMG_BASIC_PATH;
+            }else if(type.equals("imgDynamic")){
+                path_dir=databus.DYNAMIC_IMG_BASIC_PATH;
+            }else{
+                path_dir=databus.GROUP_IMG_BASIC_PATH;
+            }
             File file = new File(System.getProperty("user.dir") + path_dir + imgName);
 
 
