@@ -34,6 +34,10 @@ private static String responseHeader="Access-Control-Allow-Origin";
         System.out.println(map.get("judge_point")=="");
         return databus.setResponse(0,list);
     }
+    @RequestMapping("/remoteTest")
+    public Object Remote(@RequestParam String param){
+        return databus.setResponse(param);
+    }
     @RequestMapping("/oper")
     public Object operate(@RequestParam String sql){
         try {
